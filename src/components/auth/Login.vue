@@ -12,6 +12,7 @@
           <input type="password" class="form-control" v-model="password">
         </div>
         <p v-if="feedback" class="text-danger text-center">{{feedback}}</p>
+        <router-link :to="{name:'ResetPwd'}">Forgot password?</router-link>
         <div class="text-center">
           <button type="submit" class="btn btn-primary">Login</button>
         </div>

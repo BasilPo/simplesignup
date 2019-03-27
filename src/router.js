@@ -3,13 +3,13 @@ import Router from "vue-router";
 import Home from "@/components/home/Home.vue";
 import Signup from "@/components/auth/Signup.vue";
 import Login from "@/components/auth/Login.vue";
+import ResetPwd from "@/components/auth/ResetPwd.vue";
 import firebase from "firebase";
 
 Vue.use(Router);
 
 const router = new Router({
-  routes: [
-    {
+  routes: [{
       path: "/",
       name: "Home",
       component: Home,
@@ -26,6 +26,11 @@ const router = new Router({
       path: "/login",
       name: "Login",
       component: Login
+    },
+    {
+      path: "/reset-pwd",
+      name: "ResetPwd",
+      component: ResetPwd
     }
   ]
 });
