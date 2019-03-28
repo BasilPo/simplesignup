@@ -4,33 +4,54 @@ import Home from "@/components/home/Home.vue";
 import Signup from "@/components/auth/Signup.vue";
 import Login from "@/components/auth/Login.vue";
 import ResetPwd from "@/components/auth/ResetPwd.vue";
+import ViewProfile from "@/components/profile/ViewProfile.vue";
 import firebase from "firebase";
 
 Vue.use(Router);
 
 const router = new Router({
-  routes: [{
+  routes: [
+    {
       path: "/",
       name: "Home",
       component: Home,
       meta: {
-        requiresAuth: true
+        requiresAuth: false,
+        requiresNavbar: true
       }
     },
     {
       path: "/signup",
       name: "Signup",
-      component: Signup
+      component: Signup,
+      meta: {
+        requiresNavbar: true
+      }
     },
     {
       path: "/login",
       name: "Login",
-      component: Login
+      component: Login,
+      meta: {
+        requiresNavbar: true
+      }
     },
     {
       path: "/reset-pwd",
       name: "ResetPwd",
-      component: ResetPwd
+      component: ResetPwd,
+      meta: {
+        requiresNavbar: true
+      }
+    },
+    {
+      path: "/profile",
+      name: "ViewProfile",
+      component: ViewProfile,
+      meta: {
+        requiresAuth: true,
+        requiresNavbar: false
+      }
     }
   ]
 });

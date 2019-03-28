@@ -1,18 +1,18 @@
 <template>
   <div class="reset card mx-auto">
     <div class="card-body">
-      <div class="card-header text-center text-danger font-weight-bold">Reset your password</div>
+      <h2 class="card-header text-center text-danger font-weight-bold">Reset your password</h2>
       <form @submit.prevent="resetPwd">
         <p
-          class="text-center text-info"
+          class="text-center text-dark"
         >Enter your email address and we will send you a link to reset your password</p>
         <div class="form-group">
-          <label for="email">Email:</label>
+          <label for="email">Email</label>
           <input type="email" class="form-control" v-model="email">
         </div>
         <p v-if="feedback" class="text-danger text-center">{{feedback}}</p>
         <div class="text-center">
-          <button type="submit" class="btn btn-primary">Send password reset email</button>
+          <button type="submit" class="btn btn-dark">Send password reset email</button>
         </div>
       </form>
     </div>
@@ -43,17 +43,6 @@ export default {
           .catch(error => {
             console.log(error.message);
           });
-        // firebase
-        //   .auth()
-        //   .signInWithEmailAndPassword(this.email, this.password)
-        //   .then(cred => {
-        //     this.$router.push({ name: "Home" });
-        //   })
-        //   .catch(error => {
-        //     this.feedback = error.message;
-        //     this.email = null;
-        //     this.password = null;
-        //   });
         this.feedback = null;
       } else {
         this.feedback = "Please enter your email address";

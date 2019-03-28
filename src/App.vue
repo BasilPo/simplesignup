@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    <Navbar/>
+    <Navbar v-if="$route.meta.requiresNavbar"/>
     <router-view/>
   </div>
 </template>
@@ -12,12 +12,16 @@ export default {
   name: "App",
   components: {
     Navbar
+  },
+  data() {
+    return {};
   }
 };
 </script>
 
 <style>
 body {
-  background: #eee;
+  background: #343a40;
+  
 }
 </style>

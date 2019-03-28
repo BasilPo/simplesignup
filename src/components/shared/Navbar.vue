@@ -1,18 +1,18 @@
 <template>
-  <nav class="navbar navbar-expand-sm bg-dark navbar-dark fixed-top logout">
+  <nav class="navbar navbar-expand-sm bg-danger navbar-dark logout">
     <router-link :to="{name:'Home'}" class="navbar-brand">Logo</router-link>
     <ul class="navbar-nav ml-auto">
       <li v-if="!user" class="nav-item">
-        <router-link :to="{name: 'Signup'}" class="nav-link">Sign up</router-link>
+        <router-link :to="{name: 'Signup'}" class="nav-link text-light">Sign up</router-link>
       </li>
       <li v-if="!user" class="nav-item">
-        <router-link :to="{name: 'Login'}" class="nav-link">Login</router-link>
+        <router-link :to="{name: 'Login'}" class="nav-link text-light">Sign in</router-link>
       </li>
       <li v-if="user" class="nav-item">
-        <a href="#" class="nav-link">{{user.email}}</a>
+        <a href="#" class="nav-link text-light">{{user.displayName}}</a>
       </li>
       <li v-if="user" class="nav-item">
-        <a href="#" @click="logout" class="nav-link">Logout</a>
+        <a href="#" @click="logout" class="nav-link text-light">Sign out</a>
       </li>
     </ul>
   </nav>
