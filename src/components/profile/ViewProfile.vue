@@ -9,7 +9,7 @@
           class="d-flex mt-1 justify-content-between align-items-center border-bottom border-dark pb-2"
         >
           <i class="fas fa-user"></i>
-          <h4 v-if="user" class="mb-0 b">{{user.displayName}}</h4>
+          <h4 v-if="profileName" class="mb-0 b">{{profileName}}</h4>
         </div>
         <div class="d-flex flex-column justify-content-center mt-2">
           <h3 class="text-center text-danger">My Polls</h3>
@@ -24,7 +24,15 @@
               <i class="fas fa-trash" @click="deletePoll(poll.id)"></i>
             </h3>
             <div class="card-body">
-              <div class="card-text">qwe</div>
+              <div class="card-text">{{poll.text}}</div>
+            </div>
+            <div class="card-footer">
+              <i
+                @click="editPoll(poll.id)"
+                class="fas fa-edit"
+                data-toggle="modal"
+                data-target="#AddModal"
+              ></i>
             </div>
           </div>
         </div>
@@ -35,8 +43,14 @@
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
           <div class="modal-header">
-            <h4 class="modal-title text-danger">Create a new poll</h4>
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <h4 class="modal-title text-danger">{{isEdit ? "Update the":"Create a new"}} poll</h4>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+              @click="resetIsEdit"
+            >
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
@@ -46,10 +60,19 @@
                 <label for="title">Title</label>
                 <input type="text" class="form-control" v-model="title">
               </div>
+              <div class="form-group">
+                <label for="text">Text</label>
+                <textarea class="form-control" v-model="text"></textarea>
+              </div>
             </form>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-dark" data-dismiss="modal">Cancel</button>
+            <button
+              @click="resetIsEdit"
+              type="button"
+              class="btn btn-dark"
+              data-dismiss="modal"
+            >Cancel</button>
             <button
               @click="addPoll"
               type="button"
@@ -73,7 +96,11 @@ export default {
     return {
       user: null,
       title: null,
-      polls: []
+      text: null,
+      polls: [],
+      isEdit: false,
+      updateId: null,
+      profileName: null
     };
   },
   methods: {
@@ -86,22 +113,49 @@ export default {
         });
     },
     addPoll() {
-      if (this.title) {
-        db.collection("polls")
-          .add({
-            title: this.title,
-            user_id: this.user.uid
-          })
-          .then(ref => {
-            this.polls.push({
+      if (this.title && this.text) {
+        if (!this.isEdit) {
+          db.collection("polls")
+            .add({
               title: this.title,
               user_id: this.user.uid,
-              id: ref.id
+              text: this.text
+            })
+            .then(ref => {
+              this.polls.push({
+                title: this.title,
+                user_id: this.user.uid,
+                id: ref.id,
+                text: this.text
+              });
+              //Edit
+              this.title = null;
+              this.text = null;
+            })
+            .catch(error => {
+              console.log(error.message);
             });
-          })
-          .catch(error => {
-            console.log(error.message);
-          });
+        } else {
+          this.isEdit = false;
+          db.collection("polls")
+            .doc(this.updateId)
+            .update({
+              title: this.title,
+              text: this.text
+            })
+            .then(() => {
+              let updatedPoll = this.polls.find(poll => {
+                return poll.id == this.updateId;
+              });
+              updatedPoll.title = this.title;
+              updatedPoll.text = this.text;
+              this.title = null;
+              this.title = null;
+            })
+            .catch(error => {
+              console.log(error);
+            });
+        }
       }
     },
     deletePoll(id) {
@@ -113,6 +167,21 @@ export default {
             return poll.id != id;
           });
         });
+    },
+    editPoll(id) {
+      this.updateId = id;
+      let ref = db.collection("polls").doc(this.updateId);
+      ref.get().then(doc => {
+        this.title = doc.data().title;
+        this.text = doc.data().text;
+      });
+      this.isEdit = true;
+      //DOM !!!!!!!!!!!!!
+    },
+    resetIsEdit() {
+      this.isEdit = false;
+      this.text = null;
+      this.title = null;
     }
   },
   created() {
@@ -121,6 +190,20 @@ export default {
       if (user) {
         this.user = user;
         searchUserId = user.uid;
+        this.profileName = user.displayName;
+
+        //цей блок необхідний для опрацювання відображення user name на /profile відразу
+        //після реєстрації
+        if (!this.profileName) {
+          db.collection("users")
+            .doc(user.uid)
+            .get()
+            .then(doc => {
+              if (doc.exists) {
+                this.profileName = doc.data().name;
+              }
+            });
+        }
 
         db.collection("polls")
           .where("user_id", "==", searchUserId)
@@ -171,7 +254,8 @@ export default {
   left: 1.5vw;
   cursor: pointer;
 }
-.fa-sign-out-alt:hover {
+.fa-sign-out-alt:hover,
+.fa-edit:hover {
   color: #343a40;
 }
 .fa-trash {
@@ -181,6 +265,13 @@ export default {
   right: 5px;
   top: 5px;
   font-size: 0.8em;
+}
+.fa-trash:hover {
+  color: #f8f9fa;
+}
+.fa-edit {
+  cursor: pointer;
+  color: #dc3545;
 }
 .card-columns .card {
   box-shadow: 0 3px 10px 3px rgba(255, 255, 255, 0.3);
