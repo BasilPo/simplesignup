@@ -34,6 +34,7 @@
 import db from "@/firebase/init";
 export default {
   name: "Poll",
+  props: ["poll_id"],
   data() {
     return {
       poll: null,
@@ -56,7 +57,7 @@ export default {
   },
   created() {
     db.collection("polls")
-      .doc(this.$route.params.poll_id)
+      .doc(this.poll_id)
       .get()
       .then(poll => {
         if (poll.exists) {

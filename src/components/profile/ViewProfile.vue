@@ -83,14 +83,17 @@
                 </div>
               </div>-->
               <div class="form-group">
-                <label for="add-question-title">Add a question</label>
-                <textarea class="form-control" name="add-question-title" v-model="newQuestionTitle"></textarea>
+                <label for="question-title">Add a question</label>
+                <textarea class="form-control" name="question-title" v-model="questionTitle"></textarea>
+              </div>
+              <div class="form-grou">
+                <label for="question-id">Id</label>
+                <input type="text" name="question-id" class="form-control" v-model="questionId">
               </div>
               <div v-for="(answer, index) in answers" :key="index" class="form-control">
-                <label for=""></label>
+                <label for></label>
                 <input type="text" v-model="answer.id" class="form-control">
                 <input type="text" v-model="answer.title" class="form-control">
-
               </div>
               <div class="form-group">
                 <label for="add-answer">Add answer choices</label>
@@ -177,7 +180,9 @@ export default {
       user: null,
       title: null,
       questions: [],
-      newQuestion: null,
+      question: null,
+      questionTitle: null,
+      questionId: null,
       polls: [],
       isEdit: false,
       updateId: null,

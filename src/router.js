@@ -55,9 +55,10 @@ const router = new Router({
       }
     },
     {
-      path: "/poll/:poll_id",
+      path: "/poll",
       name: "Poll",
       component: Poll,
+      props: true,
       meta: {
         requiresAuth: true,
         requiresNavbar: true
