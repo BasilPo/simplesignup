@@ -9,7 +9,11 @@
         <router-link :to="{name: 'Login'}" class="nav-link text-light">Sign in</router-link>
       </li>
       <li v-if="user" class="nav-item">
-        <a href="#" class="nav-link text-light">{{user.displayName}}</a>
+        <router-link
+          :to="{name: 'ViewProfile'}"
+          id="disp-name"
+          class="nav-link text-light"
+        >{{user.displayName}}</router-link>
       </li>
       <li v-if="user" class="nav-item">
         <a href="#" @click="logout" class="nav-link text-light">Sign out</a>
@@ -52,6 +56,10 @@ export default {
 </script>
 
 <style>
+#disp-name:hover {
+  background-color: #343a40;
+  border-radius: 3px;
+}
 </style>
 
 
