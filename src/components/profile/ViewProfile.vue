@@ -5,15 +5,13 @@
         <i @click="logout" class="fas fa-sign-out-alt"></i>
       </div>
       <div class="col-2 bg-light">
-        <div
-          class="d-flex mt-1 justify-content-between align-items-center border-bottom border-dark pb-2"
-        >
+        <div class="d-flex mt-1 align-items-center border-bottom border-dark pb-2">
           <i class="fas fa-user"></i>
-          <h4 v-if="profileName" class="mb-0">{{profileName}}</h4>
+          <h5 v-if="profileName" class="mb-0 ml-auto">{{profileName}}</h5>
         </div>
         <div class="d-flex flex-column justify-content-center mt-2">
           <h3 class="text-center text-danger">My Polls</h3>
-          <a class="btn btn-dark text-light" data-toggle="modal" data-target="#AddModal">Add Polls</a>
+          <router-link :to="{name:'AddPoll'}" class="btn btn-dark text-light">Add Polls</router-link>
         </div>
         <div class="d-flex flex-column justify-content-center border-top border-dark mt-4">
           <h4 class="text-center text-dark mt-2">Polls</h4>
@@ -48,7 +46,7 @@
       </div>
     </div>
     <!-- Modal -->
-    <div class="modal fade" id="AddModal" tabindex="-1" role="dialog">
+    <!-- <div class="modal fade" id="AddModal" tabindex="-1" role="dialog">
       <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
           <div class="modal-header">
@@ -69,19 +67,6 @@
                 <label for="title">Title</label>
                 <input type="text" class="form-control" v-model="title">
               </div>
-              <!-- <div v-for="(quiz, index) in quizzes" :key="index" class="form-group">
-                <label for="quiz">Quiz:</label>
-                <input
-                  type="text"
-                  name="quiz"
-                  v-model="quizzes[index].question"
-                  class="form-control"
-                >
-                <label>Answers:</label>
-                <div v-for="(answer, i) in quizzes[index].answers" :key="i">
-                  <input type="text" name="answer" v-model="answer.text">
-                </div>
-              </div>-->
               <div class="form-group">
                 <label for="question-title">Add a question</label>
                 <textarea class="form-control" name="question-title" v-model="questionTitle"></textarea>
@@ -135,7 +120,7 @@
           </div>
         </div>
       </div>
-    </div>
+    </div>-->
     <!-- Find Modal -->
     <div class="modal fade" id="FindModal" tabindex="-1" role="dialog">
       <div class="modal-dialog modal-dialog-centered" role="document">
@@ -183,11 +168,11 @@ export default {
       question: null,
       questionTitle: null,
       questionId: null,
-      polls: [],
-      isEdit: false,
+      polls: [], //
+      // isEdit: false,
       updateId: null,
-      profileName: null,
-      findid: null,
+      profileName: null, //
+      findid: null, //
       answerTitle: null,
       answerId: null,
       answers: []
@@ -275,16 +260,6 @@ export default {
     },
     findPoll(id) {
       this.$router.push({ name: "Poll", params: { poll_id: id } });
-    },
-    addAnswer() {
-      if (this.answerTitle && this.answerId) {
-        let objAnswer = {};
-        objAnswer.title = this.answerTitle;
-        objAnswer.id = this.answerId;
-        this.answers.push(objAnswer);
-        this.answerTitle = null;
-        this.answerId = null;
-      }
     }
   },
   created() {
@@ -346,8 +321,7 @@ export default {
   cursor: pointer;
 }
 .fa-sign-out-alt:hover,
-.fa-edit:hover,
-.fa-plus-circle:hover {
+.fa-edit:hover {
   color: #343a40;
 }
 .fa-trash {
@@ -361,8 +335,7 @@ export default {
 .fa-trash:hover {
   color: #f8f9fa;
 }
-.fa-edit,
-.fa-plus-circle {
+.fa-edit {
   cursor: pointer;
   color: #dc3545;
 }
@@ -371,8 +344,5 @@ export default {
 }
 .card-columns .card h3 {
   position: relative;
-}
-.fa-plus-circle {
-  font-size: 1.5em;
 }
 </style>

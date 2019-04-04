@@ -56,22 +56,28 @@ export default {
     }
   },
   created() {
-    db.collection("polls")
-      .doc(this.poll_id)
-      .get()
-      .then(poll => {
-        if (poll.exists) {
-          this.poll = poll.data();
-          this.curQuiz = this.poll.questions[this.curQuizIndex];
-          this.feedback = null;
-        } else {
-          this.feedback = "No polls for the specified number";
-        }
-      })
-      .catch(error => {
-        console.log(error);
-        this.feedback = "Something is wrong with the server";
-      });
+    if (this.poll_id) {
+      //можливо! для того щоб дані не втратити при перезавантажені сторінки необхідно застосувати localStorage
+      db.collection("polls")
+        .doc(this.poll_id)
+        .get()
+        .then(poll => {
+          if (poll.exists) {
+            this.poll = poll.data();
+            this.curQuiz = this.poll.questions[this.curQuizIndex];
+            this.feedback = null;
+            if (this.curQuizIndex == this.poll.questions.length - 1) {
+              this.isSubmit = true;
+            }
+          } else {
+            this.feedback = "No polls for the specified number";
+          }
+        })
+        .catch(error => {
+          console.log(error);
+          this.feedback = "Something is wrong with the server";
+        });
+    }
   }
 };
 </script>
@@ -87,4 +93,3 @@ export default {
   font-size: 1em;
 }
 </style>
-
