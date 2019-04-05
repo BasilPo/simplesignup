@@ -23,6 +23,7 @@
         </div>
       </div>
       <div class="card-footer">
+        <button v-if="curQuizIndex" @click="prevQuiz" class="btn btn-dark mr-2">Previous</button>
         <button v-if="isSubmit" @click="submit" class="btn btn-danger">Submit</button>
         <button v-if="!isSubmit" @click="nextQuiz" class="btn btn-dark">Next</button>
       </div>
@@ -52,6 +53,13 @@ export default {
       this.curQuiz = this.poll.questions[++this.curQuizIndex];
       if (this.curQuizIndex == this.poll.questions.length - 1) {
         this.isSubmit = true;
+      }
+    },
+    prevQuiz() {
+      if (this.curQuizIndex > 0) {
+        this.curQuizIndex--;
+        this.curQuiz = this.poll.questions[this.curQuizIndex];
+        this.isSubmit = false;
       }
     }
   },
