@@ -1,10 +1,13 @@
 <template>
-  <div class="addpoll container-fluid">
-    <div class="card text-dark" id="add-poll">
+  <div class="editpoll container-fluid">
+    <div v-if="poll" class="card text-dark" id="add-poll">
       <div class="card-header">
         <span id="curindex" class="badge badge-danger badge-pill">current: {{curQuestionIndex+1}}</span>
-        <span id="curindex" class="badge badge-dark badge-pill ml-1">saved: {{questions.length}}</span>
-        <h3 class="text-center">Create a new poll</h3>
+        <span
+          id="curindex"
+          class="badge badge-dark badge-pill ml-1"
+        >saved: {{poll.questions.length}}</span>
+        <h3 class="text-center">Update the poll</h3>
       </div>
       <div class="card-body">
         <p class="text-danger text-center" v-if="feedback">{{feedback}}</p>
@@ -13,20 +16,24 @@
             <div class="input-group-prepend">
               <span class="input-group-text">Title</span>
             </div>
-            <input type="text" class="form-control" placeholder="Poll Header" v-model="title">
+            <input type="text" class="form-control" placeholder="Poll Header" v-model="poll.title">
           </div>
           <fieldset class="px-3 rounded">
-            <legend class="rounded px-1 text-light">Add a question</legend>
+            <legend class="rounded px-1 text-light">Edit a question</legend>
             <div class="form-group">
               <label>Title</label>
-              <textarea class="form-control" name="question-title" v-model="questionTitle"></textarea>
+              <textarea class="form-control" name="question-title" v-model="curQuestion.title"></textarea>
             </div>
             <div class="form-group">
               <label>Id</label>
-              <input type="text" name="question-id" class="form-control" v-model="questionId">
+              <input type="text" name="question-id" class="form-control" v-model="curQuestion.id">
             </div>
-            <p v-if="answers.length">Answers:</p>
-            <div v-for="(answer, index) in answers" :key="index" class="form-control p-0 mb-2">
+            <p v-if="curQuestion.answers.length">Answers:</p>
+            <div
+              v-for="(answer, index) in curQuestion.answers"
+              :key="index"
+              class="form-control p-0 mb-2"
+            >
               <div class="input-group">
                 <div class="input-group-prepend">
                   <span class="input-group-text">Id</span>
@@ -64,7 +71,7 @@
       </div>
       <div class="card-footer d-flex">
         <button @click="cancel" type="button" class="btn btn-dark mr-1">Cancel</button>
-        <button @click="addPoll" type="button" class="btn btn-danger mr-auto">Save Poll</button>
+        <button @click="editPoll" type="button" class="btn btn-danger mr-auto">Update Poll</button>
         <button
           @click="prevQuestion"
           type="button"
@@ -75,7 +82,7 @@
           @click="nextQuestion"
           type="button"
           class="btn btn-outline-danger"
-        >{{questions.length>curQuestionIndex?"Next":"Save"}} Question</button>
+        >{{!isNewQuestion?"Next":"Save"}} Question</button>
       </div>
     </div>
   </div>
@@ -85,20 +92,17 @@
 import firebase from "firebase";
 import db from "@/firebase/init";
 export default {
-  name: "AddPoll",
+  name: "EditPoll",
+  props: ["poll_id"],
   data() {
     return {
-      user: null,
+      poll: null,
+      curQuestion: null,
       feedback: null,
-      title: null,
-      questions: [],
-      questionId: null,
-      questionTitle: null,
-      answers: [],
       answerId: null,
       answerTitle: null,
       curQuestionIndex: 0,
-      isReady: false
+      isNewQuestion: false
     };
   },
   methods: {
@@ -110,89 +114,79 @@ export default {
         let objAnswer = {};
         objAnswer.title = this.answerTitle;
         objAnswer.id = this.answerId;
-        this.answers.push(objAnswer);
+        this.curQuestion.answers.push(objAnswer);
         this.answerTitle = null;
         this.answerId = null;
       }
     },
     deleteAnswer(answer) {
-      this.answers.splice(this.answers.indexOf(answer), 1);
+      this.curQuestion.answers.splice(
+        this.curQuestion.answers.indexOf(answer),
+        1
+      );
     },
     nextQuestion() {
-      if (this.curQuestionIndex == this.questions.length) {
-        if (this.questionId && this.questionTitle && this.answers.length) {
-          let objQuestion = {};
-          objQuestion.id = this.questionId;
-          objQuestion.title = this.questionTitle;
-          objQuestion.answers = this.answers.slice(); //!!!
-          this.questions.push(objQuestion);
-          this.curQuestionIndex++;
-          this.questionId = null;
-          this.questionTitle = null;
-          this.answers.length = 0;
-          this.isReady = true;
-          this.feedback = null;
-        } else {
-          this.feedback = "You must fill in all the fields";
-        }
+      if (
+        !this.curQuestion.id ||
+        !this.curQuestion.title ||
+        !this.curQuestion.answers.length
+      ) {
+        this.feedback = "You must fill in all the fields";
       } else {
-        if (++this.curQuestionIndex < this.questions.length) {
-          this.questionId = this.questions[this.curQuestionIndex].id;
-          this.questionTitle = this.questions[this.curQuestionIndex].title;
-          this.answers = this.questions[this.curQuestionIndex].answers;
+        if (this.curQuestionIndex < this.poll.questions.length - 1) {
+          this.curQuestionIndex++;
+          this.curQuestion = this.poll.questions[this.curQuestionIndex];
         } else {
-          this.questionId = null;
-          this.questionTitle = null;
-          // this.answers.length = 0;
-          this.answers = [];
-          this.feedback = null;
+          if (!this.isNewQuestion) {
+            let objQuestion = { id: null, title: null, answers: [] };
+            this.curQuestion = objQuestion;
+            this.isNewQuestion = true;
+            this.curQuestionIndex++;
+          } else {
+            this.poll.questions.push(this.curQuestion);
+
+            this.isNewQuestion = false;
+          }
         }
+        this.feedback = null;
       }
     },
     prevQuestion() {
       if (this.curQuestionIndex > 0) {
         this.curQuestionIndex--;
-        this.questionId = this.questions[this.curQuestionIndex].id;
-        this.questionTitle = this.questions[this.curQuestionIndex].title;
-        this.answers = this.questions[this.curQuestionIndex].answers;
+        this.curQuestion = this.poll.questions[this.curQuestionIndex];
+        this.isNewQuestion = false;
         this.feedback = null;
       }
     },
-    addPoll() {
-      if (
-        this.title &&
-        this.questionId &&
-        this.questionTitle &&
-        this.answers.length &&
-        !this.isReady
-      ) {
-        let objQuestion = {};
-        objQuestion.id = this.questionId;
-        objQuestion.title = this.questionTitle;
-        objQuestion.answers = this.answers.slice(); //!!!
-        this.questions.push(objQuestion);
-        this.isReady = true;
-      }
-      if (this.isReady) {
-        db.collection("polls")
-          .add({
-            title: this.title,
-            user_id: this.user.uid,
-            questions: this.questions
-          })
-          .then(() => {
-            this.$router.push({ name: "ViewProfile" });
-          })
-          .catch(error => {
-            console.log(error);
-          });
-      } else {
-        this.feedback = "You must fill in all the fields";
-      }
+    editPoll() {
+      db.collection("polls")
+        .doc(this.poll.id)
+        .update({
+          title: this.poll.title,
+          user_id: this.poll.user_id,
+          questions: this.poll.questions
+        })
+        .then(() => {
+          this.$router.push({ name: "ViewProfile" });
+        })
+        .catch(error => {
+          console.log(error);
+        });
     }
   },
   created() {
-    this.user = firebase.auth().currentUser;
+    let ref = db.collection("polls").doc(this.poll_id);
+    ref
+      .get()
+      .then(doc => {
+        this.poll = doc.data();
+        this.poll.id = doc.id;
+        this.curQuestion = this.poll.questions[this.curQuestionIndex];
+      })
+      .catch(error => {
+        console.log(error);
+      });
   }
 };
 </script>
@@ -203,8 +197,6 @@ export default {
   width: 80%;
   margin: 0 auto;
   margin-top: 1em;
-  max-height: 565px;
-  overflow: auto;
 }
 fieldset {
   background-color: #eee;

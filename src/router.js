@@ -7,6 +7,7 @@ import ResetPwd from "@/components/auth/ResetPwd.vue";
 import ViewProfile from "@/components/profile/ViewProfile.vue";
 import Poll from "@/components/home/Poll.vue";
 import AddPoll from "@/components/profile/AddPoll.vue";
+import EditPoll from "@/components/profile/EditPoll.vue";
 import firebase from "firebase";
 
 Vue.use(Router);
@@ -69,6 +70,16 @@ const router = new Router({
       path: "/add-poll",
       name: "AddPoll",
       component: AddPoll,
+      meta: {
+        requiresAuth: true,
+        requiresNavbar: true
+      }
+    },
+    {
+      path: "/edit-poll",
+      name: "EditPoll",
+      component: EditPoll,
+      props: true,
       meta: {
         requiresAuth: true,
         requiresNavbar: true

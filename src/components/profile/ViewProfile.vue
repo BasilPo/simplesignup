@@ -34,93 +34,12 @@
               <div class="card-text">{{poll.id}}</div>
             </div>
             <div class="card-footer">
-              <i
-                @click="editPoll(poll.id)"
-                class="fas fa-edit"
-                data-toggle="modal"
-                data-target="#AddModal"
-              ></i>
+              <i @click="editPoll(poll.id)" class="fas fa-edit"></i>
             </div>
           </div>
         </div>
       </div>
     </div>
-    <!-- Modal -->
-    <!-- <div class="modal fade" id="AddModal" tabindex="-1" role="dialog">
-      <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h4 class="modal-title text-danger">{{isEdit ? "Update the":"Create a new"}} poll</h4>
-            <button
-              type="button"
-              class="close"
-              data-dismiss="modal"
-              aria-label="Close"
-              @click="resetIsEdit"
-            >
-              <span aria-hidden="true">&times;</span>
-            </button>
-          </div>
-          <div class="modal-body">
-            <form @submit.prevent>
-              <div class="form-group">
-                <label for="title">Title</label>
-                <input type="text" class="form-control" v-model="title">
-              </div>
-              <div class="form-group">
-                <label for="question-title">Add a question</label>
-                <textarea class="form-control" name="question-title" v-model="questionTitle"></textarea>
-              </div>
-              <div class="form-grou">
-                <label for="question-id">Id</label>
-                <input type="text" name="question-id" class="form-control" v-model="questionId">
-              </div>
-              <div v-for="(answer, index) in answers" :key="index" class="form-control">
-                <label for></label>
-                <input type="text" v-model="answer.id" class="form-control">
-                <input type="text" v-model="answer.title" class="form-control">
-              </div>
-              <div class="form-group">
-                <label for="add-answer">Add answer choices</label>
-                <div class="form-row">
-                  <div class="col-2 form-group">
-                    <label for="answer-id">Id</label>
-                    <input class="form-control" type="text" name="anser-id" v-model="answerId">
-                  </div>
-                  <div class="col-9 form-group">
-                    <label for="answer-title">Title</label>
-                    <input
-                      class="form-control"
-                      type="text"
-                      name="answer-title"
-                      v-model="answerTitle"
-                    >
-                  </div>
-                  <div class="col-1 d-flex align-items-center">
-                    <i class="fas fa-plus-circle" @click="addAnswer"></i>
-                  </div>
-                </div>
-              </div>
-            </form>
-          </div>
-          <div class="modal-footer">
-            <button
-              @click="resetIsEdit"
-              type="button"
-              class="btn btn-dark"
-              data-dismiss="modal"
-            >Cancel</button>
-            <button
-              @click="addPoll"
-              type="button"
-              class="btn btn-danger"
-              data-dismiss="modal"
-              v-bind:disabled="!title"
-            >Save</button>
-          </div>
-        </div>
-      </div>
-    </div>-->
     <!-- Find Modal -->
     <div class="modal fade" id="FindModal" tabindex="-1" role="dialog">
       <div class="modal-dialog modal-dialog-centered" role="document">
@@ -163,19 +82,9 @@ export default {
   data() {
     return {
       user: null,
-      title: null,
-      questions: [],
-      question: null,
-      questionTitle: null,
-      questionId: null,
-      polls: [], //
-      // isEdit: false,
-      updateId: null,
-      profileName: null, //
-      findid: null, //
-      answerTitle: null,
-      answerId: null,
-      answers: []
+      polls: [],
+      profileName: null,
+      findid: null
     };
   },
   methods: {
@@ -186,52 +95,6 @@ export default {
         .then(() => {
           this.$router.push({ name: "Login" });
         });
-    },
-    addPoll() {
-      if (this.title && this.newQuestion) {
-        if (!this.isEdit) {
-          db.collection("polls")
-            .add({
-              title: this.title,
-              user_id: this.user.uid,
-              questions: this.questions
-            })
-            .then(ref => {
-              this.polls.push({
-                title: this.title,
-                user_id: this.user.uid,
-                id: ref.id,
-                questions: this.questions
-              });
-              //Edit
-              this.title = null;
-              this.text = null;
-            })
-            .catch(error => {
-              console.log(error.message);
-            });
-        } else {
-          this.isEdit = false;
-          db.collection("polls")
-            .doc(this.updateId)
-            .update({
-              title: this.title,
-              text: this.text
-            })
-            .then(() => {
-              let updatedPoll = this.polls.find(poll => {
-                return poll.id == this.updateId;
-              });
-              updatedPoll.title = this.title;
-              updatedPoll.text = this.text;
-              this.title = null;
-              this.text = null;
-            })
-            .catch(error => {
-              console.log(error);
-            });
-        }
-      }
     },
     deletePoll(id) {
       db.collection("polls")
@@ -244,19 +107,7 @@ export default {
         });
     },
     editPoll(id) {
-      this.updateId = id;
-      let ref = db.collection("polls").doc(this.updateId);
-      ref.get().then(doc => {
-        this.title = doc.data().title;
-        this.text = doc.data().text;
-      });
-      this.isEdit = true;
-      //DOM !!!!!!!!!!!!!
-    },
-    resetIsEdit() {
-      this.isEdit = false;
-      this.text = null;
-      this.title = null;
+      this.$router.push({ name: "EditPoll", params: { poll_id: id } });
     },
     findPoll(id) {
       this.$router.push({ name: "Poll", params: { poll_id: id } });
@@ -269,7 +120,6 @@ export default {
         this.user = user;
         searchUserId = user.uid;
         this.profileName = user.displayName;
-
         //цей блок необхідний для опрацювання відображення user name на /profile відразу
         //після реєстрації
         if (!this.profileName) {
@@ -282,7 +132,6 @@ export default {
               }
             });
         }
-
         db.collection("polls")
           .where("user_id", "==", searchUserId)
           .get()
